@@ -1,10 +1,17 @@
 {
   "expo": {
-    "name": "house-float-hunters",
+    "name": "House Float Hunters",
     "slug": "house-float-hunters",
-    "version": "1.0.0",
+    "owner": "kalquaddoomi",
+    "privacy": "public",
+    "sdkVersion": "40.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "1.0.26",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/hfh_icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -20,13 +27,32 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+      "package": "com.twintreelabs.housefloathunters",
+      "versionCode": 26,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyChn57LIzPs_e-k4v31J4pkKoHl6DmQEMQ"
+        }
       }
+    },
+    "androidNavigationBar": {
+      "visible": "immersive"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "description": "Seek out the Wild House Floats of New Orleans and Capture Them One and All!",
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "twin-tree-studios",
+            "project": "house-float-hunters-rebuild",
+            "authToken": "5f5f5da876c344ecac8d65ebd61170e58569f9bfae2a4b8baab93caf2c295ad1"
+          }
+        }
+      ]
     }
   }
 }

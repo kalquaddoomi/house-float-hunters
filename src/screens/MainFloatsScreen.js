@@ -80,7 +80,18 @@ export default function MainFloatsScreen({ navigation }) {
                     return false
                 }))
 
-        })();
+        })().catch(error=>{
+            console.log(error)
+            floats.map((float) => {
+                float.huntRange = -1
+            })
+            setWildFloats(floats.filter((float) => {
+                if((typeof float.captured === 'undefined' || float.captured !== true)) {
+                    return true
+                }
+                return false
+            }))
+        });
     }, [loaded, isFocused])
 
 
@@ -106,7 +117,7 @@ export default function MainFloatsScreen({ navigation }) {
                 <Text style={styles.floatCardTitle}>{floatData.item.title}</Text>
                 <Text style={styles.floatCardAddress}>{floatData.item.address}</Text>
                 <View style={styles.floatCardRow}>
-                   <Text>Distance: {floatData.item.huntRange > 0 ? `${floatData.item.huntRange}m` : 'Calculating...'} </Text>
+                   <Text>Distance: {floatData.item.huntRange > 0 ? `${floatData.item.huntRange}m` : floatData.item.huntRange === -1 ? 'Unavailable' : 'Calculating...'} </Text>
                     <TouchableOpacity
                         style={styles.floatCatch}
                         onPress={()=>{

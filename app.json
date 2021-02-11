@@ -13,7 +13,7 @@
     "orientation": "portrait",
     "icon": "./assets/hfh_icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/hfh_splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -24,7 +24,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.twintreelabs.housefloathunters",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "package": "com.twintreelabs.housefloathunters",

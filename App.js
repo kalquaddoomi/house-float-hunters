@@ -7,6 +7,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from "./src/screens/WelcomeScreen";
 import MainFloatsScreen from "./src/screens/MainFloatsScreen";
 import FloatCaptureScreen from "./src/screens/FloatCaptureScreen";
+import CameraCaptureScreen from "./src/screens/CameraCaptureScreen";
+import KeepItScreen from "./src/screens/KeepItScreen";
+import TrophyCaseScreen from "./src/screens/TrophyCaseScreen";
+import TrophyScreen from "./src/screens/TrophyScreen";
+import SettingsScreen from "./src/screens/SettingsScreen";
 const Stack = createStackNavigator();
 import * as Sentry from 'sentry-expo';
 
@@ -23,6 +28,12 @@ export default function App() {
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="House Floats" component={MainFloatsScreen} />
             <Stack.Screen name="Float Capture" component={FloatCaptureScreen} />
+            <Stack.Screen name="Catch Mode" component={CameraCaptureScreen} />
+            <Stack.Screen name="Keep It?" component={KeepItScreen} />
+            <Stack.Screen name="Trophy Case" component={TrophyCaseScreen} />
+            <Stack.Screen name="Trophy" component={TrophyScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+
         </Stack.Navigator>
       </NavigationContainer>
   );

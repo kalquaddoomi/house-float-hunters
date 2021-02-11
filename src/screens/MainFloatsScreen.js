@@ -8,6 +8,7 @@ import Constants from "expo-constants";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
 import haversine from 'haversine';
+import NavTray from "../components/NavTray";
 
 export default function MainFloatsScreen({ navigation }) {
     const [region, setRegion] = React.useState({
@@ -18,6 +19,7 @@ export default function MainFloatsScreen({ navigation }) {
     })
     const isFocused = useIsFocused()
     const [floats, setFloats] = React.useState([])
+    const [wildFloats, setWildFloats] = React.useState([])
     const [loaded, setLoaded] = React.useState(false)
     const [hunterPosition, setHunterPosition] = React.useState({coords:
             {
@@ -28,7 +30,6 @@ export default function MainFloatsScreen({ navigation }) {
     const localFloatStore = FileSystem.documentDirectory + 'floats.json'
 
     React.useEffect( ()=>{
-
         FileSystem.getInfoAsync(localFloatStore).then((info)=> {
             if(info.exists){
                 FileSystem.readAsStringAsync(localFloatStore).then((data)=>{
@@ -47,31 +48,40 @@ export default function MainFloatsScreen({ navigation }) {
                 if (status !== 'granted') {
                     return;
                 }
-                let location = await Location.getLastKnownPositionAsync({});
+                let location = await Location.getCurrentPositionAsync({});
+                if(location !== null) {
+                    setHunterPosition(location)
+                    floats.map((float) => {
+                        float.huntRange = parseFloat(haversine(
+                            {
+                                latitude: float.coordinates.latitude,
+                                longitude: float.coordinates.longitude
+                            },
+                            {
+                                latitude: location.coords.latitude,
+                                longitude: location.coords.longitude
+                            }, {unit: 'meter'}
+                        ).toFixed(2))
+                    })
 
-                floats.map((float) => {
-                    float.huntRange = parseFloat(haversine(
-                        {
-                            latitude: float.coordinates.latitude,
-                            longitude: float.coordinates.longitude
-                        },
-                        {
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude
-                        }, {unit: 'meter'}
-                    ).toFixed(2))
-                })
-                setHunterPosition(location)
-                setRegion({
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                    latitudeDelta: 0.014,
-                    longitudeDelta: 0.024
-                })
-                floats.sort((a, b) => (a.huntRange > b.huntRange) ? 1 : -1)
+                    setRegion({
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude,
+                        latitudeDelta: 0.014,
+                        longitudeDelta: 0.024
+                    })
+                    floats.sort((a, b) => (a.huntRange > b.huntRange) ? 1 : -1)
+                }
+
+                setWildFloats(floats.filter((float) => {
+                    if((typeof float.captured === 'undefined' || float.captured !== true)) {
+                        return true
+                    }
+                    return false
+                }))
+
         })();
     }, [loaded, isFocused])
-
 
 
     const getFloatsAPI = () => {
@@ -91,8 +101,6 @@ export default function MainFloatsScreen({ navigation }) {
             });
      }
 
-
-
     const renderFloatCard = (floatData) =>
             <View style={styles.floatCard}>
                 <Text style={styles.floatCardTitle}>{floatData.item.title}</Text>
@@ -111,54 +119,56 @@ export default function MainFloatsScreen({ navigation }) {
             </View>
 
 
-
+    console.log(hunterPosition)
     return(
         <SafeAreaView style={styles.container}>
-
+            <Text style={styles.bigNotice}>Floats in the Wild: {wildFloats.length}</Text>
             <MapView
-                style={styles.map}
+                style={styles.fullMap}
                 region={region}
             >
-                {
-                    floats.map((float) => {
-                        return (
-                            <Marker
-                                key={`mark-${float.id}`}
-                                coordinate={
-                                    {
-                                        latitude: float.coordinates.latitude,
-                                        longitude: float.coordinates.longitude
-                                    }
+            {
+                wildFloats.map((float) => {
+                    return (
+                        <Marker
+                            key={`mark-${float.id}`}
+                            coordinate={
+                                {
+                                    latitude: float.coordinates.latitude,
+                                    longitude: float.coordinates.longitude
                                 }
-                                onPress={() => {
-                                    navigation.navigate('Float Capture', float)
-                                }}
-                            />
-                        )
-                    })
-                }
-                {
-                    hunterPosition.coords.longitude !== 0 &&
-                    <Marker
-                        key={'hunter-position'}
-                        coordinate={
-                            {
-                                latitude: hunterPosition.coords.latitude,
-                                longitude: hunterPosition.coords.longitude
                             }
+                            onPress={() => {
+                                navigation.navigate('Float Capture', float)
+                            }}
+                        />
+                    )
+
+                })
+            }
+            {
+                hunterPosition.coords.longitude !== 0 &&
+                <Marker
+                    key={'hunter-position'}
+                    coordinate={
+                        {
+                            latitude: hunterPosition.coords.latitude,
+                            longitude: hunterPosition.coords.longitude
                         }
-                        pinColor={'blue'}
-                    />
-                }
+                    }
+                    pinColor={'blue'}
+                />
+            }
             </MapView>
             <FlatList
                 style={styles.floatList}
-                data={floats}
+                data={wildFloats}
                 renderItem={item => renderFloatCard(item)}
                 keyExtractor={item => item.id.toString()}
             />
-
-            <Text>version: {Constants.manifest.version}</Text>
+            <NavTray
+                navigation={navigation}
+                />
         </SafeAreaView>
     )
 }

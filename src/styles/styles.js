@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     },
     welcome_header: {
         width: Dimensions.get('window').width-20,
-        height: 100
+        height: Dimensions.get('window').height/12
     },
     game_guide: {
     },

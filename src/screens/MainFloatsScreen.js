@@ -9,6 +9,7 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
 import haversine from 'haversine';
 import NavTray from "../components/NavTray";
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function MainFloatsScreen({ navigation }) {
     const [region, setRegion] = React.useState({
@@ -21,6 +22,7 @@ export default function MainFloatsScreen({ navigation }) {
     const [floats, setFloats] = React.useState([])
     const [wildFloats, setWildFloats] = React.useState([])
     const [loaded, setLoaded] = React.useState(false)
+    const [hunterLocReady, setHunterLocReady] = React.useState(false)
     const [hunterPosition, setHunterPosition] = React.useState({coords:
             {
                 latitude: 0,
@@ -70,6 +72,7 @@ export default function MainFloatsScreen({ navigation }) {
         setWildFloats(floats.filter((float) => {
             return (typeof float.captured === 'undefined' || float.captured !== true);
         }))
+        setHunterLocReady(true)
     }
 
     React.useEffect(() => {
@@ -78,10 +81,16 @@ export default function MainFloatsScreen({ navigation }) {
                 if (status !== 'granted') {
                     return;
                 }
-                Location.getLastKnownPositionAsync({}).then((location) => {
-                    updateHunterPosition(location)
-                });
-                await Location.watchPositionAsync({distanceInterval: 30}, updateHunterPosition)
+                if(hunterPosition.coords.latitude === 0) {
+                    setHunterLocReady(false)
+                    Location.getLastKnownPositionAsync({}).then((location) => {
+                        updateHunterPosition(location)
+                    });
+                } else {
+                    setWildFloats(floats.filter((float) => {
+                        return (typeof float.captured === 'undefined' || float.captured !== true);
+                    }))
+                }
         })().catch(error=>{
             console.log(error)
             floats.map((float) => {
@@ -132,7 +141,26 @@ export default function MainFloatsScreen({ navigation }) {
             </View>
     return(
         <SafeAreaView style={styles.container}>
-            <Text style={styles.bigNotice}>Floats in the Wild: {(wildFloats.length === 0 ? 'One Sec...' : wildFloats.length)}</Text>
+            <View style={styles.headerBar}>
+                <Text style={styles.headerTitleNotice}>Floats in the Wild: {(wildFloats.length === 0 ? 'One Sec...' : wildFloats.length)}</Text>
+                {hunterLocReady ?
+                    <TouchableOpacity style={styles.updatePositionBarIcon}
+                    onPress={()=>{
+                        setHunterLocReady(false)
+                        Location.getCurrentPositionAsync().then((huntLoc) => {
+                            updateHunterPosition(huntLoc)
+                        })
+                    }}
+                    >
+                        <MaterialIcons name="gps-not-fixed" size={18} color="black" />
+                        <Text style={styles.updatePositionBarText}>Update My</Text>
+                        <Text style={styles.updatePositionBarText}>Location</Text>
+                    </TouchableOpacity>
+                    :
+                    <ActivityIndicator size={"small"} color={"green"}/>
+                    }
+
+            </View>
             <MapView
                 style={styles.fullMap}
                 region={region}

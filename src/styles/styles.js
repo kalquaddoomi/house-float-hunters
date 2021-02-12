@@ -55,6 +55,32 @@ export const styles = StyleSheet.create({
         width: Dimensions.get('window').width-30,
         height: Dimensions.get('window').height/3,
     },
+    headerBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+    },
+    headerTitleNotice: {
+        fontSize: 22,
+        flex: 3,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 12,
+    },
+    updatePositionBarIcon: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 10,
+        marginBottom: 5,
+    },
+    updatePositionBarText: {
+        fontSize: 10,
+        flex: 1,
+    },
     floatList: {
         flexDirection: "column",
         marginTop: 10

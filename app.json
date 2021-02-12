@@ -9,7 +9,7 @@
       "ios",
       "android"
     ],
-    "version": "1.0.29",
+    "version": "1.0.30",
     "orientation": "portrait",
     "icon": "./assets/hfh_icon.png",
     "splash": {
@@ -26,11 +26,11 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.twintreelabs.housefloathunters",
-      "buildNumber": "2.0.0"
+      "buildNumber": "3"
     },
     "android": {
       "package": "com.twintreelabs.housefloathunters",
-      "versionCode": 29,
+      "versionCode": 30,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyChn57LIzPs_e-k4v31J4pkKoHl6DmQEMQ"

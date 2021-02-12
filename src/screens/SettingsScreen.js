@@ -18,7 +18,11 @@ export default function SettingsScreen({ route, navigation }) {
             localFloatStore
         )
             .then(({ uri }) => {
-                setMessage('All Trophies Deleted and Data Reset')
+                setMessage('All Trophies Deleted and Data Reset!')
+                setTimeout(()=>{
+                    navigation.navigate('Welcome')
+                }, 1000)
+
             })
             .catch(error => {
                 console.error(error);

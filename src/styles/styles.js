@@ -121,7 +121,7 @@ export const styles = StyleSheet.create({
     flashContainer: {
         marginTop: -60,
         width: Dimensions.get('window').width,
-        paddingTop: 40,
+        paddingTop: 60,
         paddingBottom: 20,
         marginBottom: 5,
     },

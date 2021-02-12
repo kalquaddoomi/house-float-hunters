@@ -1,5 +1,5 @@
 import React from 'react'
-import {TouchableOpacity, Text, View, Animated, ActivityIndicator, ScrollView } from 'react-native';
+import {TouchableOpacity, Text, View, Animated, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import {styles} from "../styles/styles";
 import MapView, {Marker} from 'react-native-maps';
@@ -7,10 +7,13 @@ import * as Location from 'expo-location';
 import haversine from 'haversine';
 import {useIsFocused} from "@react-navigation/native";
 import NavTray from "../components/NavTray";
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import moment from "moment";
+import * as FileSystem from "expo-file-system";
 
 export default function FloatCaptureScreen({ route, navigation }) {
-    const catchRange = 100
+    const catchRange = 30
     const isFocused = useIsFocused()
     const [float, setFloat] = React.useState(route.params)
     const [locReady, setLocReady] = React.useState(false)
@@ -25,6 +28,7 @@ export default function FloatCaptureScreen({ route, navigation }) {
 
     React.useEffect(()=>{
         ( async () => {
+            console.log("Updating Positon")
             let { status } = await Location.requestPermissionsAsync();
             if (status !== 'granted') {
                 return;
@@ -44,6 +48,7 @@ export default function FloatCaptureScreen({ route, navigation }) {
             ).toFixed(2))
         })();
     }, [isFocused]);
+
     const cycleMap = [2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0].map((i) => {
         return (Animated.spring(colorAnim, {
             toValue: i,
@@ -52,6 +57,20 @@ export default function FloatCaptureScreen({ route, navigation }) {
         }))
     })
     const cycleColors = Animated.sequence(cycleMap)
+
+    const recalculateDistance  = (location) => {
+        float.huntRange = parseFloat(haversine(
+            {
+                latitude: float.coordinates.latitude,
+                longitude: float.coordinates.longitude
+            },
+            {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+            }, {unit: 'meter'}
+        ).toFixed(2))
+        setFloat(float)
+    }
 
     const capture = () => {
         if(float.huntRange <= catchRange ) {
@@ -83,9 +102,11 @@ export default function FloatCaptureScreen({ route, navigation }) {
                             .then((coords)=> {
                                 setHunterLocation(coords)
                                 setLocReady(true)
+                                recalculateDistance(hunterLocation)
                             }
                         );
                     }}>
+                    <MaterialIcons style={{flex: 0.3}} name="gps-not-fixed" size={24} color="black" />
                     <Text style={styles.updatePositionText}>
                         Update My Position
                     </Text>
@@ -99,10 +120,34 @@ export default function FloatCaptureScreen({ route, navigation }) {
         )
     }
 
+    const makeASkipCapture = async (float) => {
+        const localFloatStore = FileSystem.documentDirectory + 'floats.json'
+        let saveFloat = float
+        const timeStamp = moment.now()
+        saveFloat.captured = true
+        saveFloat.caught_time = timeStamp
+        saveFloat.the_photo = 'STOCK'
+        let outFloats = []
+        await FileSystem.readAsStringAsync(localFloatStore).then((data)=>{
+            const allFloats = JSON.parse(data)
+            outFloats = allFloats.map((checkFloat) => {
+                if(checkFloat.id === saveFloat.id) {
+                    return saveFloat
+                } else {
+                    return checkFloat
+                }
+            })
+            FileSystem.writeAsStringAsync(localFloatStore, JSON.stringify(outFloats))
+        })
+        return saveFloat
+    }
+
     return (
-    <Animated.View
+
+        <SafeAreaView style={styles.container}>
+            <Animated.View
                 style={[
-                    styles.container,
+                    styles.flashContainer,
                     {
                         backgroundColor: colorAnim.interpolate({
                             inputRange: [0, 1, 2],
@@ -111,8 +156,8 @@ export default function FloatCaptureScreen({ route, navigation }) {
                     },
                 ]}
             >
-        <SafeAreaView style={styles.container}>
         {(float.huntRange < catchRange ? <Text style={styles.bigNotice}>A WILD HOUSE FLOAT APPEARS!!!</Text> : <></>)}
+            </Animated.View>
             <MapView
                 style={styles.map}
                 initialRegion={{
@@ -144,11 +189,38 @@ export default function FloatCaptureScreen({ route, navigation }) {
             <Text style={styles.floatCaptureAddress}>{float.address}</Text>
             <Text style={styles.floatCaptureRange}>Range: {float.huntRange} meters</Text>
             {capture()}
+            <TouchableOpacity
+                style={styles.skipCatchingButton}
+                onPress={()=>{
+                        Alert.alert(
+                            "Confirm Auto Capture",
+                            "Automatic Capture will remove this Float from your list of House Floats to catch and put it in the trophy case. A default Image will be assigned to it, but you won't be able to take a photo of it later. Do you still want to do this?",
+                            [
+                                {
+                                    text: "Cancel",
+                                    onPress: () => {},
+                                    style: "cancel"
+                                },
+                                {
+                                    text: "YES",
+                                    onPress: () => {
+                                        makeASkipCapture(float).then((saveFloat)=> {
+                                            navigation.navigate('Trophy', saveFloat)
+                                        })
+                                    },
+                                    style: "Ok"
+                                }
+                            ],
+                            { cancelable: false }
+                        );
+                }}
+                >
+                <MaterialCommunityIcons style={{flex: 0.4}} name="home-remove" size={30} color="red" />
+                <Text style={styles.skipCatchingText}>I don't want to hunt this one down. Capture this Float Automatically.</Text>
+            </TouchableOpacity>
             </ScrollView>
             <NavTray
                 navigation={navigation} />
         </SafeAreaView>
-    </Animated.View>
-
     )
 }

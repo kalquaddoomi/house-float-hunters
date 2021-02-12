@@ -27,6 +27,7 @@ export default function SettingsScreen({ route, navigation }) {
     return(
         <SafeAreaView style={styles.container}>
             <Text style={styles.bigNotice}>Settings</Text>
+
             <View style={styles.settingsContainer}>
                 <TouchableOpacity
                     style={styles.settingsButton}

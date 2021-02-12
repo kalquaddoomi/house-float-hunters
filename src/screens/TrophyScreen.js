@@ -1,5 +1,5 @@
 import React from 'react'
-import {TouchableOpacity, Text, View, FlatList, Image } from 'react-native';
+import {TouchableOpacity, Text, View, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import {styles} from "../styles/styles";
 import moment from 'moment'
@@ -13,9 +13,9 @@ export default function TrophyScreen({ route, navigation }) {
         <SafeAreaView style={styles.container}>
                 <Image
                     style={styles.trophyPageImage}
-                    source={{
+                    source={(trophy.the_photo === 'STOCK' ? require('../../assets/stock_float.png') :{
                         uri: trophy.the_photo
-                    }}
+                    })}
                     />
                 <View style={styles.trophyPlaque}>
                     <View style={styles.trophyPlaqueColumn}>
@@ -27,7 +27,6 @@ export default function TrophyScreen({ route, navigation }) {
                         <Text style={styles.plaqueAddress}>At: {trophy.address}</Text>
                     </View>
                 </View>
-
             <NavTray
                 navigation={navigation}
                 />

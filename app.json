@@ -9,11 +9,11 @@
       "ios",
       "android"
     ],
-    "version": "1.0.28",
+    "version": "1.0.29",
     "orientation": "portrait",
     "icon": "./assets/hfh_icon.png",
     "splash": {
-      "image": "./assets/hfh_splash.png",
+      "image": "./assets/hfh_splash2.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -24,13 +24,13 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.twintreelabs.housefloathunters",
-      "buildNumber": "1.0.0"
+      "buildNumber": "2.0.0"
     },
     "android": {
       "package": "com.twintreelabs.housefloathunters",
-      "versionCode": 28,
+      "versionCode": 29,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyChn57LIzPs_e-k4v31J4pkKoHl6DmQEMQ"

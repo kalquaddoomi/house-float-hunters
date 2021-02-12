@@ -42,44 +42,46 @@ export default function MainFloatsScreen({ navigation }) {
         })
     }, [])
 
+    const updateHunterPosition = (location) => {
+        if(location !== null) {
+            setHunterPosition(location)
+            floats.map((float) => {
+                float.huntRange = parseFloat(haversine(
+                    {
+                        latitude: float.coordinates.latitude,
+                        longitude: float.coordinates.longitude
+                    },
+                    {
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude
+                    }, {unit: 'meter'}
+                ).toFixed(2))
+            })
+
+            setRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.014,
+                longitudeDelta: 0.024
+            })
+            floats.sort((a, b) => (a.huntRange > b.huntRange) ? 1 : -1)
+        }
+
+        setWildFloats(floats.filter((float) => {
+            return (typeof float.captured === 'undefined' || float.captured !== true);
+        }))
+    }
+
     React.useEffect(() => {
         ( async () => {
                 let { status } = await Location.requestPermissionsAsync();
                 if (status !== 'granted') {
                     return;
                 }
-                let location = await Location.getCurrentPositionAsync({});
-                if(location !== null) {
-                    setHunterPosition(location)
-                    floats.map((float) => {
-                        float.huntRange = parseFloat(haversine(
-                            {
-                                latitude: float.coordinates.latitude,
-                                longitude: float.coordinates.longitude
-                            },
-                            {
-                                latitude: location.coords.latitude,
-                                longitude: location.coords.longitude
-                            }, {unit: 'meter'}
-                        ).toFixed(2))
-                    })
-
-                    setRegion({
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
-                        latitudeDelta: 0.014,
-                        longitudeDelta: 0.024
-                    })
-                    floats.sort((a, b) => (a.huntRange > b.huntRange) ? 1 : -1)
-                }
-
-                setWildFloats(floats.filter((float) => {
-                    if((typeof float.captured === 'undefined' || float.captured !== true)) {
-                        return true
-                    }
-                    return false
-                }))
-
+                Location.getLastKnownPositionAsync({}).then((location) => {
+                    updateHunterPosition(location)
+                });
+                await Location.watchPositionAsync({distanceInterval: 30}, updateHunterPosition)
         })().catch(error=>{
             console.log(error)
             floats.map((float) => {
@@ -128,12 +130,9 @@ export default function MainFloatsScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
             </View>
-
-
-    console.log(hunterPosition)
     return(
         <SafeAreaView style={styles.container}>
-            <Text style={styles.bigNotice}>Floats in the Wild: {wildFloats.length}</Text>
+            <Text style={styles.bigNotice}>Floats in the Wild: {(wildFloats.length === 0 ? 'One Sec...' : wildFloats.length)}</Text>
             <MapView
                 style={styles.fullMap}
                 region={region}
@@ -171,12 +170,16 @@ export default function MainFloatsScreen({ navigation }) {
                 />
             }
             </MapView>
-            <FlatList
-                style={styles.floatList}
-                data={wildFloats}
-                renderItem={item => renderFloatCard(item)}
-                keyExtractor={item => item.id.toString()}
-            />
+            {(
+                wildFloats.length === 0 ?
+                <ActivityIndicator style={{flex:1}} size={'large'} color={'green'}/> :
+                <FlatList
+                    style={styles.floatList}
+                    data={wildFloats}
+                    renderItem={item => renderFloatCard(item)}
+                    keyExtractor={item => item.id.toString()}
+                />
+            )}
             <NavTray
                 navigation={navigation}
                 />

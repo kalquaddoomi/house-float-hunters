@@ -21,9 +21,9 @@ export default function TrophyCaseScreen({ route, navigation }) {
         <View style={styles.trophyCard}>
             <Image
                 style={styles.trophyImage}
-                source={{
+                source={(trophy.item.the_photo === 'STOCK' ? require('../../assets/stock_float.png') :{
                     uri: trophy.item.the_photo
-                }}
+                })}
             />
             <View style={styles.trophyCardColumn}>
                 <Text style={styles.trophyCardTitle}>{trophy.item.title}</Text>

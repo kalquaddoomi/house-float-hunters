@@ -1,5 +1,5 @@
 import React from 'react'
-import {TouchableOpacity, Text, View, Image} from 'react-native';
+import {TouchableOpacity, Text, View, Image, ScrollView} from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import {styles} from "../styles/styles";
 import * as FileSystem from 'expo-file-system';
@@ -35,6 +35,7 @@ export default function KeepItScreen({ route, navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.bigNotice}>This is What You Caught:</Text>
+            <ScrollView>
             <Image
                 style={styles.keepItPreview}
                 source={{
@@ -58,6 +59,7 @@ export default function KeepItScreen({ route, navigation }) {
                     <Text style={styles.buttonPurpleText}> Throw It Back </Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
         </SafeAreaView>
     )
 }

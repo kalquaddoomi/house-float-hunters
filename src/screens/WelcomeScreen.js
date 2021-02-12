@@ -1,5 +1,5 @@
 import React from 'react'
-import {StyleSheet, Image, TouchableOpacity, Text, View, Dimensions } from 'react-native';
+import {StyleSheet, Image, TouchableOpacity, Text, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import {styles} from "../styles/styles"
 import Constants from 'expo-constants';
@@ -7,11 +7,12 @@ import Constants from 'expo-constants';
 export default function WelcomeScreen({ navigation }) {
     return(
         <SafeAreaView style={styles.container}>
+
             <Image
                 style={styles.welcome_header}
                 source={require('../../assets/hfh2.png')}
             />
-            <View style={styles.game_guide}>
+            <ScrollView style={styles.game_guide}>
             <Text style={styles.welcome_block}>
                 Welcome House Float Hunter! House Floats have appears all over the City of New Orleans, and beyond,
                 and it's up to you to catch them all!
@@ -40,7 +41,7 @@ export default function WelcomeScreen({ navigation }) {
                 }}>
                 <Text style={styles.start_text}>Start Hunting!</Text>
             </TouchableOpacity>
-            </View>
+            </ScrollView>
 
         </SafeAreaView>
     )

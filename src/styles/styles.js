@@ -118,6 +118,13 @@ export const styles = StyleSheet.create({
         alignSelf: 'center',
         textAlign: 'center'
     },
+    flashContainer: {
+        marginTop: -60,
+        width: Dimensions.get('window').width,
+        paddingTop: 40,
+        paddingBottom: 20,
+        marginBottom: 5,
+    },
     catchFloatButton: {
         borderWidth: 2,
         borderColor: purple,
@@ -127,7 +134,8 @@ export const styles = StyleSheet.create({
         width: Dimensions.get('window').width - 80,
         marginTop: 20,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        alignSelf: 'center'
     },
     catchFloatText:{
         fontSize: 24,
@@ -143,17 +151,19 @@ export const styles = StyleSheet.create({
         color: 'black'
     },
     updatePosition: {
+        flex: 1,
+        flexDirection: 'row',
         borderWidth: 2,
         borderColor: 'black',
         backgroundColor: '#ffffff',
         borderRadius: 5,
         padding: 10,
-        width: Dimensions.get('window').width - 80,
         marginTop: 20,
-        justifyContent: 'center',
+        justifyContent: 'space-evenly',
         alignItems: 'center'
     },
     updatePositionText: {
+        flex: 1,
         fontSize: 18,
         color: 'black',
         fontWeight: 'bold'
@@ -316,7 +326,24 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 10
-    }
+    },
+    skipCatchingButton: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        marginTop: 20,
+        padding: 5,
+        backgroundColor: '#fee',
+        borderWidth: 1,
+        borderRadius: 5
+    },
+    skipCatchingText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        flex: 2,
+        flexWrap: 'wrap'
+    },
+
 
 })
 

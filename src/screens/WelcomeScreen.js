@@ -24,8 +24,7 @@ export default function WelcomeScreen({ navigation }) {
                 case. Otherwise, get closer and snap that picture.
             </Text>
             <Text style={styles.welcome_block}>
-                Keep going, catch them all! Remember: Be Safe, Keep Your Distance from others, and Wear a Mask.
-                Wash your hands when you get home. It's wild out there.
+                Keep going, catch them all! Keep safe, it's wild out there!
             </Text>
             <Text style={styles.welcome_block}>
                 Enjoy the game!

@@ -10,6 +10,7 @@ import * as Location from 'expo-location';
 import haversine from 'haversine';
 import NavTray from "../components/NavTray";
 import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MainFloatsScreen({ navigation }) {
     const [region, setRegion] = React.useState({
@@ -23,14 +24,16 @@ export default function MainFloatsScreen({ navigation }) {
     const [wildFloats, setWildFloats] = React.useState([])
     const [loaded, setLoaded] = React.useState(false)
     const [hunterLocReady, setHunterLocReady] = React.useState(false)
+    const [trackingHunter, setTrackingHunter] = React.useState('Off')
+    const [trackUnsubscribe, setTrackUnsubscribe] = React.useState(null)
     const [hunterPosition, setHunterPosition] = React.useState({coords:
             {
                 latitude: 0,
                 longitude:0
             }
     })
+    const [huntSettings, setHuntSettings] = React.useState( {followSpeed: 30})
     const localFloatStore = FileSystem.documentDirectory + 'floats.json'
-
     React.useEffect( ()=>{
         FileSystem.getInfoAsync(localFloatStore).then((info)=> {
             if(info.exists){
@@ -63,8 +66,8 @@ export default function MainFloatsScreen({ navigation }) {
             setRegion({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
-                latitudeDelta: 0.014,
-                longitudeDelta: 0.024
+                latitudeDelta: 0.006,
+                longitudeDelta: 0.0012
             })
             floats.sort((a, b) => (a.huntRange > b.huntRange) ? 1 : -1)
         }
@@ -81,6 +84,7 @@ export default function MainFloatsScreen({ navigation }) {
                 if (status !== 'granted') {
                     return;
                 }
+
                 if(hunterPosition.coords.latitude === 0) {
                     setHunterLocReady(false)
                     Location.getLastKnownPositionAsync({}).then((location) => {
@@ -91,6 +95,8 @@ export default function MainFloatsScreen({ navigation }) {
                         return (typeof float.captured === 'undefined' || float.captured !== true);
                     }))
                 }
+                const huntTrackSpeed = await AsyncStorage.getItem('hunter_track_speed')
+                setHuntSettings({followSpeed: parseInt(huntTrackSpeed)})
         })().catch(error=>{
             console.log(error)
             floats.map((float) => {
@@ -122,7 +128,6 @@ export default function MainFloatsScreen({ navigation }) {
                 console.error(error);
             });
      }
-
     const renderFloatCard = (floatData) =>
             <View style={styles.floatCard}>
                 <Text style={styles.floatCardTitle}>{floatData.item.title}</Text>
@@ -142,6 +147,30 @@ export default function MainFloatsScreen({ navigation }) {
     return(
         <SafeAreaView style={styles.container}>
             <View style={styles.headerBar}>
+                {(trackingHunter !== 'Working' ?
+                    <TouchableOpacity style={styles.updatePositionBarIcon}
+                                      onPress={()=>{
+                                          setTrackingHunter('Working')
+                                          if(trackingHunter === 'Off') {
+                                              Location.watchPositionAsync({distanceInterval: huntSettings.followSpeed},
+                                                  updateHunterPosition).then((stopWatch) => {
+                                                      setTrackingHunter('On')
+                                                      setTrackUnsubscribe(stopWatch)
+                                              })
+                                          } else {
+                                              trackUnsubscribe.remove()
+                                              setTrackingHunter('Off')
+                                          }
+
+                                      }}
+                    >
+                        <MaterialIcons style={{flex:2, marginTop: 8}} name={trackingHunter === 'On' ? "gps-fixed" : "gps-off"} size={20} color="black" />
+                        <Text style={styles.updatePositionBarText}>Follow:</Text>
+                        <Text style={styles.updatePositionBarText}>{trackingHunter}</Text>
+                    </TouchableOpacity>
+                    :
+                    <ActivityIndicator style={{flex: 1}} size={"large"} color={"green"}/>
+                )}
                 <Text style={styles.headerTitleNotice}>Floats in the Wild: {(wildFloats.length === 0 ? 'One Sec...' : wildFloats.length)}</Text>
                 {hunterLocReady ?
                     <TouchableOpacity style={styles.updatePositionBarIcon}
@@ -152,12 +181,12 @@ export default function MainFloatsScreen({ navigation }) {
                         })
                     }}
                     >
-                        <MaterialIcons name="gps-not-fixed" size={18} color="black" />
+                        <MaterialIcons style={{flex:2, marginTop: 8}} name="refresh" size={20} color="black" />
                         <Text style={styles.updatePositionBarText}>Update My</Text>
                         <Text style={styles.updatePositionBarText}>Location</Text>
                     </TouchableOpacity>
                     :
-                    <ActivityIndicator size={"small"} color={"green"}/>
+                    <ActivityIndicator style={{flex: 1}} size={"large"} color={"green"}/>
                     }
 
             </View>

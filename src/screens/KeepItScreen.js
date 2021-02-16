@@ -26,7 +26,7 @@ export default function KeepItScreen({ route, navigation }) {
             })
             FileSystem.writeAsStringAsync(localFloatStore, JSON.stringify(outFloats)).then(
                 ()=>{
-                    navigation.navigate("Trophy Case", saveFloat)
+                    navigation.navigate("Trophy", saveFloat)
                 }
             )
         })

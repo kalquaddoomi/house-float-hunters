@@ -76,6 +76,7 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         marginBottom: 5,
+        backgroundColor: '#f5f5f5'
     },
     updatePositionBarText: {
         fontSize: 10,
@@ -339,7 +340,8 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         backgroundColor: '#ccc',
-        padding: 20
+        padding: 20,
+        marginBottom: 10
     },
     settingsText: {
         marginLeft: 10,

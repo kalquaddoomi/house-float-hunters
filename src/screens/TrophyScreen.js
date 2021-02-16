@@ -8,7 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function TrophyScreen({ route, navigation }) {
     const [trophy, setTrophy] = React.useState(route.params)
-    console.log(trophy)
     return(
         <SafeAreaView style={styles.container}>
                 <Image

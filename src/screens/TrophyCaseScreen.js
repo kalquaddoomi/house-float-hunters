@@ -39,7 +39,7 @@ export default function TrophyCaseScreen({ route, navigation }) {
                 </TouchableOpacity>
             </View>
         </View>
-    console.log(trophies)
+
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.bigNotice}>Your Trophy Case</Text>

@@ -28,7 +28,6 @@ export default function FloatCaptureScreen({ route, navigation }) {
 
     React.useEffect(()=>{
         ( async () => {
-            console.log("Updating Positon")
             let { status } = await Location.requestPermissionsAsync();
             if (status !== 'granted') {
                 return;
